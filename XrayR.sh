@@ -407,6 +407,7 @@ install_warpcli(){
     echo -e "${green}WARP-Cli代理模式已启动成功！${plain}"
     echo -e "${yellow}本地Socks5代理为： 127.0.0.1:$WARPCliPort ${plain}"
     echo -e "${yellow}WARP-Cli代理模式的IP为：$socks5IP ${plain}"
+    echo -e "${yellow}请将WARP-Cli代理模式的Socks5添加到XrayR的出站规则中，进行正常的分流操作${plain}"
 }
 
 show_usage() {
