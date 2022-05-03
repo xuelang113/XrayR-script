@@ -410,6 +410,15 @@ install_warpcli(){
     echo -e "${yellow}请将WARP-Cli代理模式的Socks5添加到XrayR的出站规则中，进行正常的分流操作${plain}"
 }
 
+warp_socks5(){
+    arch=$(uname -m)
+    if [[ $arch =~ x86_64|amd64 ]]; then
+        install_warpcli
+    elif [[ $arch =~ s390x|armv8|aarch64 ]]; then
+        echo ""
+    fi
+}
+
 show_usage() {
     echo "XrayR 管理脚本使用方法: "
     echo "------------------------------------------"
