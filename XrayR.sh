@@ -366,48 +366,11 @@ show_XrayR_version() {
 }
 
 install_warpcli(){
-    tunStatus=$(cat /dev/net/tun 2>&1 | tr '[:upper:]' '[:lower:]')
-    if [[ ! $tunStatus =~ 'in bad state' ]] && [[ ! $tunStatus =~ '处于错误状态' ]] && [[ ! $tunStatus =~ 'Die Dateizugriffsnummer ist in schlechter Verfassung' ]]; then
-        red "检测到未开启TUN模块，请到VPS控制面板处开启"
-        exit 1
-    fi
-    if [[ $release == "centos" ]]; then
-        yum install -y epel-release net-tools
-        rpm -ivh http://pkg.cloudflareclient.com/cloudflare-release-el$vsid.rpm
-        yum install -y cloudflare-warp
-    elif [[ $release == "debian" ]]; then
-        apt-get update -y
-        apt install -y lsb-release  gnupg apt-transport-https
-        curl https://pkg.cloudflareclient.com/pubkey.gpg | apt-key add -
-        echo "deb http://pkg.cloudflareclient.com/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
-        apt-get update -y
-        apt install -y cloudflare-warp
-    elif [[ $release == "ubuntu" ]]; then
-        apt install -y lsb-release
-        curl https://pkg.cloudflareclient.com/pubkey.gpg | apt-key add -
-        echo "deb http://pkg.cloudflareclient.com/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
-        apt-get update -y
-        apt install -y cloudflare-warp
-    fi
-    warp-cli --accept-tos register >/dev/null 2>&1
-    read -p "请输入WARP Cli使用的代理端口（默认40000）：" WARPCliPort
-    [[ -z $WARPCliPort ]] && WARPCliPort=40000
-    warp-cli --accept-tos set-proxy-port "$WARPCliPort" >/dev/null 2>&1
-    warp-cli --accept-tos connect >/dev/null 2>&1
-    socks5Status=$(curl -sx socks5h://localhost:$WARPCliPort https://www.cloudflare.com/cdn-cgi/trace -k --connect-timeout 2 | grep warp | cut -d= -f2)
-    until [[ $socks5Status =~ on|plus ]]; do
-        echo -e "${red}启动Warp-Cli代理模式失败，正在尝试重启${plain}"
-        warp-cli --accept-tos disconnect >/dev/null 2>&1
-        warp-cli --accept-tos connect >/dev/null 2>&1
-        socks5Status=$(curl -sx socks5h://localhost:$WARPCliPort https://www.cloudflare.com/cdn-cgi/trace -k --connect-timeout 2 | grep warp | cut -d= -f2)
-        sleep 8
-    done
-    warp-cli --accept-tos enable-always-on >/dev/null 2>&1
-    socks5IP=$(curl -sx socks5h://localhost:$WARPCliPort ip.gs -k --connect-timeout 8)
-    echo -e "${green}WARP-Cli代理模式已启动成功！${plain}"
-    echo -e "${yellow}本地Socks5代理为： 127.0.0.1:$WARPCliPort ${plain}"
-    echo -e "${yellow}WARP-Cli代理模式的IP为：$socks5IP ${plain}"
-    echo -e "${yellow}请将WARP-Cli代理模式的Socks5添加到XrayR的出站规则中，进行正常的分流操作${plain}"
+    wget -N https://raw.githubusercontents.com/Misaka-blog/Misaka-WARP-Script/master/warp-cli/warp-cli.sh && bash warp-cli.sh
+}
+
+install_wireproxy(){
+    wget -N https://raw.githubusercontents.com/Misaka-blog/Misaka-WARP-Script/master/wireproxy-warp/warp4.sh && bash warp4.sh
 }
 
 warp_socks5(){
@@ -415,7 +378,7 @@ warp_socks5(){
     if [[ $arch =~ x86_64|amd64 ]]; then
         install_warpcli
     elif [[ $arch =~ s390x|armv8|aarch64 ]]; then
-        echo ""
+        install_wireproxy
     fi
 }
 
