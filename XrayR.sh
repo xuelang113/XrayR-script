@@ -367,7 +367,7 @@ show_XrayR_version() {
 
 install_warpcli(){
     tunStatus=$(cat /dev/net/tun 2>&1 | tr '[:upper:]' '[:lower:]')
-    if [[ ! $TUN =~ 'in bad state' ]] && [[ ! $TUN =~ '处于错误状态' ]] && [[ ! $TUN =~ 'Die Dateizugriffsnummer ist in schlechter Verfassung' ]]; then
+    if [[ ! $tunStatus =~ 'in bad state' ]] && [[ ! $tunStatus =~ '处于错误状态' ]] && [[ ! $tunStatus =~ 'Die Dateizugriffsnummer ist in schlechter Verfassung' ]]; then
         red "检测到未开启TUN模块，请到VPS控制面板处开启"
         exit 1
     fi
